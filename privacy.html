@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - DiskLED</title>
+    <meta name="description" content="DiskLED privacy policy. DiskLED does not collect, store, or transmit any personal data.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0e12;
+            --bg-card: #14171e;
+            --text: #e4e6eb;
+            --text-dim: #8b909e;
+            --accent-green: #34d058;
+            --border: #252830;
+            --font: 'DM Sans', -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(12, 14, 18, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            font-size: 1.15rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .nav-led {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px rgba(52, 208, 88, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+
+        .content {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 8rem 2rem 5rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .updated {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        p {
+            color: var(--text-dim);
+            margin-bottom: 1.2rem;
+            font-size: 0.95rem;
+        }
+
+        a { color: var(--accent-green); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        footer a { color: var(--text-dim); }
+        footer a:hover { color: var(--text); }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-brand">
+        <div class="nav-led"></div>
+        DiskLED
+    </a>
+    <ul class="nav-links">
+        <li><a href="/help.html">Help</a></li>
+        <li><a href="/privacy.html">Privacy</a></li>
+    </ul>
+</nav>
+
+<main class="content">
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: March 2026</p>
+
+    <h2>The short version</h2>
+    <p>DiskLED does not collect, store, or transmit any personal data. Your disk activity stays on your Mac and is never sent anywhere.</p>
+
+    <h2>Data collection</h2>
+    <p>DiskLED does not collect any data whatsoever. The app reads disk I/O statistics from macOS (via IOKit) purely to display activity indicators in the menu bar. These statistics are processed in memory and never saved to disk, logged, or transmitted over a network.</p>
+
+    <h2>Analytics and tracking</h2>
+    <p>DiskLED does not include any analytics frameworks, tracking pixels, crash reporting tools, or telemetry of any kind. The app makes no network connections.</p>
+
+    <h2>Speed Test and Stress Test</h2>
+    <p>The Speed Test and Stress Test features write temporary files to folders you choose, measure performance, then delete those files immediately. No test results or file data leave your Mac.</p>
+
+    <h2>In-App Purchases</h2>
+    <p>Purchase transactions are handled entirely by Apple through StoreKit. DiskLED does not process, store, or have access to any payment information.</p>
+
+    <h2>Third-party services</h2>
+    <p>DiskLED does not integrate with any third-party services, APIs, or SDKs beyond Apple's StoreKit framework for In-App Purchase processing.</p>
+
+    <h2>User preferences</h2>
+    <p>Your settings (LED colours, sensitivity, size preferences) are stored locally on your Mac using macOS UserDefaults. These preferences never leave your device.</p>
+
+    <h2>Children's privacy</h2>
+    <p>DiskLED does not collect data from anyone, including children under 13.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>If this policy changes, the updated version will be posted on this page with a new "last updated" date. Since DiskLED collects no data, meaningful changes are unlikely.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this privacy policy, contact <a href="mailto:support@diskled.com">support@diskled.com</a>.</p>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/help.html">Help</a>
+        <a href="mailto:support@diskled.com">Contact</a>
+    </div>
+    <p>&copy; 2026 DiskLED</p>
+</footer>
+
+</body>
+</html>

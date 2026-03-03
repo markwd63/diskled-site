@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - DiskLED</title>
+    <meta name="description" content="DiskLED help guide. Learn about LED colours, sensitivity, Speed Test, Stress Test, and troubleshooting.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0e12;
+            --bg-card: #14171e;
+            --bg-subtle: #1a1e27;
+            --text: #e4e6eb;
+            --text-dim: #8b909e;
+            --accent-green: #34d058;
+            --accent-red: #f85149;
+            --accent-amber: #d4a04a;
+            --border: #252830;
+            --font: 'DM Sans', -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(12, 14, 18, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            font-size: 1.15rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .nav-led {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px rgba(52, 208, 88, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+
+        .content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 8rem 2rem 5rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .page-sub {
+            font-size: 1rem;
+            color: var(--text-dim);
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        h2:first-of-type {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        a { color: var(--accent-green); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* LED colour swatches */
+        .led-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.92rem;
+        }
+
+        .led-table th,
+        .led-table td {
+            padding: 0.7rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .led-table th {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .led-table td { color: var(--text-dim); }
+
+        .swatch {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .swatch.green { background: var(--accent-green); box-shadow: 0 0 6px rgba(52, 208, 88, 0.4); }
+        .swatch.red { background: var(--accent-red); box-shadow: 0 0 6px rgba(248, 81, 73, 0.4); }
+        .swatch.blend { background: linear-gradient(135deg, var(--accent-green), var(--accent-red)); box-shadow: 0 0 6px rgba(200, 140, 60, 0.4); }
+        .swatch.dim { background: rgba(52, 208, 88, 0.2); }
+
+        /* Tip boxes */
+        .tip {
+            padding: 1.2rem 1.4rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent-amber);
+            border-radius: 8px;
+            margin: 1.2rem 0;
+        }
+
+        .tip-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent-amber);
+            margin-bottom: 0.4rem;
+        }
+
+        .tip p {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Code-style inline */
+        code {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            padding: 0.15rem 0.4rem;
+            background: var(--bg-subtle);
+            border-radius: 4px;
+            color: var(--text);
+        }
+
+        /* FAQ style */
+        .faq-q {
+            font-weight: 600;
+            color: var(--text);
+            margin-top: 1.2rem;
+            margin-bottom: 0.4rem;
+            font-size: 0.95rem;
+        }
+
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        footer a { color: var(--text-dim); text-decoration: none; }
+        footer a:hover { color: var(--text); }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-brand">
+        <div class="nav-led"></div>
+        DiskLED
+    </a>
+    <ul class="nav-links">
+        <li><a href="/help.html">Help</a></li>
+        <li><a href="/privacy.html">Privacy</a></li>
+    </ul>
+</nav>
+
+<main class="content">
+    <h1>Help</h1>
+    <p class="page-sub">Everything you need to know about using DiskLED.</p>
+
+    <!-- LED Colours -->
+    <h2>LED Colours</h2>
+    <p>Each LED in the menu bar represents a physical drive connected to your Mac. The colour tells you what type of activity is happening:</p>
+
+    <table class="led-table">
+        <thead>
+            <tr><th>LED State</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="swatch green"></span> Green flash</td>
+                <td>Data is being read from the drive</td>
+            </tr>
+            <tr>
+                <td><span class="swatch red"></span> Red flash</td>
+                <td>Data is being written to the drive</td>
+            </tr>
+            <tr>
+                <td><span class="swatch blend"></span> Blended colour</td>
+                <td>Simultaneous read and write activity</td>
+            </tr>
+            <tr>
+                <td><span class="swatch dim"></span> Dim</td>
+                <td>Drive is idle (no current activity)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>The default colours are green for reads and red for writes, but you can customise these to any colour via the Colours option in the menu. Each drive can have its own colour pair if you have Individual Drive LEDs.</p>
+
+    <!-- Controls -->
+    <h2>Controls</h2>
+
+    <h3>Sensitivity</h3>
+    <p>The sensitivity slider (1 to 10) controls how responsive the LEDs are. At low sensitivity, the LEDs update around 5 times per second, creating a choppy strobe effect but using minimal CPU. At high sensitivity, they update up to 15 times per second for a smooth, fluid glow. The default of 5 (10Hz) is a good balance.</p>
+
+    <h3>LED Size</h3>
+    <p>Adjusts the diameter of the LED circles in the menu bar, from 6 to 18 points. The default is 11.</p>
+
+    <h3>LED Spacing</h3>
+    <p>Controls the gap between LEDs when running in Individual Drive LEDs mode with multiple drives connected. Only visible when you have the paid upgrade and more than one drive.</p>
+
+    <!-- Free vs Paid -->
+    <h2>Free vs Individual Drive LEDs</h2>
+    <p>The free version of DiskLED shows a single combined LED that lights up whenever any connected drive has activity. This is useful for general awareness of disk activity.</p>
+    <p>The Individual Drive LEDs upgrade (a one-time In-App Purchase) gives you a separate LED for each physical drive. You can see at a glance whether your internal SSD or your external drive is active, set different colours per drive, and eject external drives directly from the menu.</p>
+    <p>If you previously purchased Individual Drive LEDs and reinstalled the app or switched Macs, use the Restore Purchases option in the menu to reactivate your purchase.</p>
+
+    <!-- Speed Test -->
+    <h2>Speed Test</h2>
+    <p>The Speed Test measures sequential read and write speeds for each connected drive. It writes a temporary test file using direct I/O (bypassing the macOS file cache) for accurate results, then reads it back and reports the throughput in MB/s.</p>
+
+    <h3>How to use it</h3>
+    <p>Open Speed Test from the menu. Your internal drive is tested automatically using the system temp folder. For external drives, click "Choose Folder" to grant write access to a location on that drive. Select a test file size (1, 2, or 5 GB) and click Run Test. Larger files give more consistent results.</p>
+
+    <h3>Understanding your results</h3>
+    <p>Typical speeds vary by drive type. Internal NVMe SSDs often exceed 2,000 MB/s. External USB-C SSDs range from 400 to 1,000 MB/s depending on the drive and connection. If your results seem dramatically lower than expected, check your cable.</p>
+
+    <div class="tip">
+        <div class="tip-label">Real-world tip</div>
+        <p>A DiskLED user discovered their external SSD was running far below its rated speed. The Speed Test revealed the problem: they were using a USB-C charging cable instead of a data cable. Both cables looked identical, but the charging cable lacked the high-speed data lines. Not all cables are the same although they look the same. If your Speed Test results seem low, try a different cable before assuming the drive is faulty.</p>
+    </div>
+
+    <!-- Stress Test -->
+    <h2>Stress Test</h2>
+    <p>The I/O Stress Test fires random-sized reads and writes at all selected drives simultaneously, simulating heavy real-world workloads. It is useful for testing drive reliability, monitoring thermals under load, or simply watching the LEDs dance.</p>
+
+    <h3>How to use it</h3>
+    <p>Open Stress Test from the menu. As with Speed Test, choose a folder on each external drive. Set the duration (10, 30, or 60 seconds) and the min/max I/O sizes. Click Start. The table updates live with total data read, written, and operations count per drive. You can stop early at any time.</p>
+
+    <!-- Eject -->
+    <h2>Ejecting Drives</h2>
+    <p>With Individual Drive LEDs, external drives show an Eject option at the bottom of their menu. DiskLED releases its monitoring handles on the drive before initiating the eject, ensuring a clean unmount. If the eject fails (for example, because another application has files open on the drive), you will see an error message explaining why.</p>
+
+    <!-- FAQ -->
+    <h2>Frequently Asked Questions</h2>
+
+    <p class="faq-q">Why is there only one LED even though I have multiple drives?</p>
+    <p>The free version shows a single combined LED. Upgrade to Individual Drive LEDs to see one LED per drive.</p>
+
+    <p class="faq-q">The app does not appear in the Dock. Is that normal?</p>
+    <p>Yes. DiskLED is a menu bar app and does not have a Dock icon. Look for the coloured LED(s) in the menu bar at the top of your screen. To quit, click the LED and choose Quit DiskLED from the menu.</p>
+
+    <p class="faq-q">Can I change the LED colours?</p>
+    <p>Yes. Click the LED in the menu bar and choose Colours to open the colour picker. You can set any colour for read and write activity independently.</p>
+
+    <p class="faq-q">Does DiskLED use a lot of CPU?</p>
+    <p>No. DiskLED uses adaptive polling that ramps up during disk activity and slows down when your drives are idle. Typical CPU usage is well under 1% at idle, rising briefly during activity. You can lower the Sensitivity slider to reduce CPU further.</p>
+
+    <p class="faq-q">Does DiskLED collect any data?</p>
+    <p>No. DiskLED makes no network connections and collects no data of any kind. See the <a href="/privacy.html">privacy policy</a> for details.</p>
+
+    <p class="faq-q">I need more help. How can I get in touch?</p>
+    <p>Contact <a href="mailto:support@diskled.com">support@diskled.com</a> and we will get back to you.</p>
+
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="mailto:support@diskled.com">Contact</a>
+    </div>
+    <p>&copy; 2026 DiskLED</p>
+</footer>
+
+</body>
+</html>

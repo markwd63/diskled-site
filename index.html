@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiskLED - Drive Activity Monitor for macOS</title>
+    <meta name="description" content="DiskLED puts coloured LED indicators in your Mac menu bar showing real-time disk activity. Includes Speed Test and Stress Test.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0e12;
+            --bg-card: #14171e;
+            --bg-subtle: #1a1e27;
+            --text: #e4e6eb;
+            --text-dim: #8b909e;
+            --accent-green: #34d058;
+            --accent-red: #f85149;
+            --accent-amber: #d4a04a;
+            --border: #252830;
+            --font: 'DM Sans', -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(12, 14, 18, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            font-size: 1.15rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .nav-led {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px rgba(52, 208, 88, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(52, 208, 88, 0.5); }
+            50% { box-shadow: 0 0 16px rgba(52, 208, 88, 0.8); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(52, 208, 88, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 99px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .hero-badge span { color: var(--accent-green); }
+
+        h1 {
+            font-size: clamp(2.8rem, 6vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 .highlight {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            max-width: 520px;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.85rem 2rem;
+            background: var(--accent-green);
+            color: #000;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(52, 208, 88, 0.3);
+        }
+
+        .hero-cta svg { width: 18px; height: 18px; }
+
+        /* LED demo */
+        .led-demo {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-top: 3.5rem;
+            padding: 0.8rem 1.6rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .led-demo-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-family: var(--mono);
+            margin-right: 0.5rem;
+        }
+
+        .demo-led {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .demo-led.green { background: var(--accent-green); box-shadow: 0 0 8px rgba(52, 208, 88, 0.5); }
+        .demo-led.red { background: var(--accent-red); box-shadow: 0 0 8px rgba(248, 81, 73, 0.5); }
+        .demo-led.idle { background: rgba(52, 208, 88, 0.2); }
+
+        .demo-led.blink-green { animation: blinkG 0.8s ease-in-out infinite; }
+        .demo-led.blink-red { animation: blinkR 1.1s ease-in-out infinite; }
+
+        @keyframes blinkG {
+            0%, 100% { background: rgba(52, 208, 88, 0.2); box-shadow: none; }
+            15%, 35% { background: #34d058; box-shadow: 0 0 8px rgba(52, 208, 88, 0.5); }
+        }
+        @keyframes blinkR {
+            0%, 100% { background: rgba(248, 81, 73, 0.2); box-shadow: none; }
+            20%, 40% { background: #f85149; box-shadow: 0 0 8px rgba(248, 81, 73, 0.5); }
+        }
+
+        /* Features */
+        .features {
+            padding: 5rem 2rem;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            padding: 1.8rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .feature-card:hover { border-color: #3a3e48; }
+
+        .feature-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .feature-icon.green { background: rgba(52, 208, 88, 0.12); }
+        .feature-icon.red { background: rgba(248, 81, 73, 0.12); }
+        .feature-icon.amber { background: rgba(212, 160, 74, 0.12); }
+
+        .feature-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.92rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* Story section */
+        .story {
+            padding: 4rem 2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .story-card {
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            border-left: 3px solid var(--accent-amber);
+        }
+
+        .story-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--accent-amber);
+        }
+
+        .story-card p {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            line-height: 1.7;
+        }
+
+        .story-card .quote {
+            margin-top: 1rem;
+            font-style: italic;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 5rem 2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pricing h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .pricing-sub {
+            color: var(--text-dim);
+            margin-bottom: 2.5rem;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .pricing-card {
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            text-align: left;
+        }
+
+        .pricing-card.pro { border-color: var(--accent-green); }
+
+        .pricing-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .pricing-card .price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+        }
+
+        .pricing-card .price span {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-dim);
+        }
+
+        .pricing-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .pricing-card li {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            padding-left: 1.4rem;
+            position: relative;
+        }
+
+        .pricing-card li::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0.45rem;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        footer a:hover { color: var(--text); }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            .pricing-cards { grid-template-columns: 1fr; }
+            nav { padding: 0.8rem 1.2rem; }
+            .nav-links { gap: 1rem; }
+            .nav-links a { font-size: 0.82rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-brand">
+        <div class="nav-led"></div>
+        DiskLED
+    </a>
+    <ul class="nav-links">
+        <li><a href="/help.html">Help</a></li>
+        <li><a href="/privacy.html">Privacy</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+    <div class="hero-badge">
+        <span>&#9679;</span> macOS Menu Bar App
+    </div>
+    <h1>See your disks <span class="highlight">come alive</span></h1>
+    <p class="hero-sub">
+        Coloured LED indicators in your menu bar showing real-time disk read and write activity. Know exactly what your drives are doing.
+    </p>
+    <a href="https://apps.apple.com/app/diskled" class="hero-cta">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Download on the Mac App Store
+    </a>
+    <div class="led-demo">
+        <span class="led-demo-label">menu bar</span>
+        <div class="demo-led blink-green"></div>
+        <div class="demo-led blink-red"></div>
+        <div class="demo-led idle"></div>
+    </div>
+</section>
+
+<section class="features">
+    <h2>Everything you need</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon green">&#9679;</div>
+            <h3>Live LED Indicators</h3>
+            <p>Coloured LEDs in your menu bar blink green for reads, red for writes, and blend for simultaneous activity. Adjustable size, spacing, and sensitivity.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon red">&#9632;</div>
+            <h3>Disk Speed Test</h3>
+            <p>Measure sequential read and write speeds across all connected drives using direct I/O that bypasses the file cache for accurate results.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon amber">&#9650;</div>
+            <h3>I/O Stress Test</h3>
+            <p>Fire random-sized reads and writes at your drives simultaneously. Configurable duration, min/max I/O sizes, and per-drive statistics.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon green">&#9881;</div>
+            <h3>Per-Drive Colours</h3>
+            <p>Customise read and write colours for each drive so you can tell at a glance which disk is active. Colours persist across sessions.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon amber">&#9889;</div>
+            <h3>Adaptive Polling</h3>
+            <p>Ramps up to 15Hz during activity and decays to 1Hz when idle, keeping CPU usage minimal. A sensitivity slider gives you control.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon red">&#9099;</div>
+            <h3>Safe Eject</h3>
+            <p>Eject external drives directly from the menu. DiskLED releases its monitoring handles first to ensure a clean unmount.</p>
+        </div>
+    </div>
+</section>
+
+<section class="story">
+    <div class="story-card">
+        <h3>Why Speed Test matters</h3>
+        <p>A DiskLED user discovered their external SSD was running dramatically slower than expected. The Speed Test showed read/write speeds far below the drive's rating. The culprit? A USB-C charging cable that looked identical to a data cable but lacked the high-speed data lines.</p>
+        <p class="quote">"Not all cables are the same although they look the same."</p>
+    </div>
+</section>
+
+<section class="pricing">
+    <h2>Simple pricing</h2>
+    <p class="pricing-sub">Free to use. Upgrade once for multiple drives.</p>
+    <div class="pricing-cards">
+        <div class="pricing-card">
+            <h3>Free</h3>
+            <div class="price">$0</div>
+            <ul>
+                <li>Combined LED for all drives</li>
+                <li>Custom read/write colours</li>
+                <li>Disk Speed Test</li>
+                <li>I/O Stress Test</li>
+                <li>Sensitivity &amp; size controls</li>
+            </ul>
+        </div>
+        <div class="pricing-card pro">
+            <h3>Individual Drive LEDs</h3>
+            <div class="price">$2.99 <span>one-time</span></div>
+            <ul>
+                <li>Everything in Free</li>
+                <li>One LED per physical drive</li>
+                <li>Per-drive colour customisation</li>
+                <li>LED spacing control</li>
+                <li>Eject from menu bar</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-links">
+        <a href="/help.html">Help</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="mailto:support@diskled.com">Contact</a>
+    </div>
+    <p>&copy; 2026 DiskLED</p>
+</footer>
+
+</body>
+</html>
